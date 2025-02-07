@@ -2,6 +2,7 @@ from playwright.async_api import async_playwright
 import asyncio
 import time
 from urllib.parse import unquote
+from gemini import summerise_text
 
 def browse_web(query):
     with async_playwright() as p:
@@ -62,64 +63,56 @@ def browse_web(query):
 
         browser.close()
 
-import asyncio
-from playwright.async_api import async_playwright
 
-async def view_websites(website_link):
+async def view_websites(query , website_links):
+    extracted_content = {}
+
     async with async_playwright() as p:
         browser = await p.chromium.launch(
             headless=False,
             args=[
-                "--disable-blink-features=AutomationControlled",
+                "--disable-blink-features=AutomationControlled",  
+                "--disable-extensions",  
+                "--disable-popup-blocking",  
                 "--start-maximized"
             ]
         )
 
         context = await browser.new_context(
-            user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/90.0.4430.212 Safari/537.36",
-            viewport={"width": 1366, "height": 768}
+            user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36",
+            viewport={"width": 1366, "height": 768},
+            bypass_csp=True
         )
-
-        # Open first page
         page = await context.new_page()
-        await page.goto(website_link, timeout=60000)
-        await asyncio.sleep(2)  # Simulate human delay
-        
-        # Open new page with modified link
-        new_page_link = f"https://r.jina.ai/{website_link}"
-        page2 = await context.new_page()
-        await page2.goto(new_page_link, timeout=60000)
-        await asyncio.sleep(2)
 
-        # Extract all content from <body>
-        body_content = await page2.evaluate("document.body.innerText")
+        await page.goto(f"https://duckduckgo.com/?q={query}&ia=web&gl=us&hl=en")
+        await asyncio.sleep(2)  # Simulate human delay
+
+        for website_link in website_links:
+            try:
+                # First, visit the original website
+                page = await context.new_page()
+                await page.goto(website_link, timeout=60000)
+                await asyncio.sleep(2)  # Simulate human delay
+
+                # Visit the transformed link (Jina AI)
+                new_page_link = f"https://r.jina.ai/{website_link}"
+                page2 = await context.new_page()
+                await page2.goto(new_page_link, timeout=60000)
+                await asyncio.sleep(2)
+
+                # Extract <body> text
+                body_content = await page2.evaluate("document.body.innerText")
+                extracted_content[website_link] = summerise_text(body_content)
+
+                await page.close()
+                await page2.close()
+                
+            except Exception as e:
+                extracted_content[website_link] = f"Error fetching content: {e}"
 
         await browser.close()
-        return body_content  # Return extracted text
 
-async def scarpe_content(website_link):
-    # make the link jina ai link
-    website_link = "https://r.jina.ai/" + website_link
-    async with async_playwright() as p:
-        browser = await p.chromium.launch(
-            headless=True,
-            args=[
-                "--disable-blink-features=AutomationControlled",
-                "--start-maximized"
-            ]
-        )
-        
-        context = await browser.new_context(
-            user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/90.0.4430.212 Safari/537.36",
-            viewport={"width": 1366, "height": 768}
-        )
-        
-        page = await context.new_page()
-        await page.goto(website_link, timeout=60000)
-        await asyncio.sleep(2)  # Simulate human delay
-        await browser.close()
-          
-# browse_web("latest trends in renewable energy")
-# view_websites()
-# asyncio.run(view_websites("https://abc.com/"))
+    return extracted_content
 
+# print(asyncio.run(view_websites("what is artificial intelligence" , ["https://abc.com/" , "https://www.ibm.com/think/topics/artificial-intelligence"])))

@@ -22,13 +22,14 @@ def main():
             final_content = " "
             
             st.subheader("Top Webpages:")
-            for link in links["webpages"]:
-                asyncio.set_event_loop_policy(asyncio.WindowsProactorEventLoopPolicy())
-                content = asyncio.run(view_websites(link))
+            website_links = links["webpages"]
+
+            asyncio.set_event_loop_policy(asyncio.WindowsProactorEventLoopPolicy())
+            content_dict = asyncio.run(view_websites(query , website_links))
+
+            for link, content in content_dict.items():
                 final_content += summerise_text(content)
                 st.markdown(f"- [{link}]({link})")
-                # st.write(content)
-            
             
             st.subheader("YouTube Video:")
             st.markdown(links['youtube'])
@@ -37,8 +38,11 @@ def main():
             final_content += summerise_text(content)
             st.markdown(f"[Watch here]({links['youtube']})")
             st.markdown(final_content)
+
         else:
             st.warning("Please enter a topic to search.")
+
+
 
 if __name__ == "__main__":
     main()

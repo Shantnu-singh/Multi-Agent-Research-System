@@ -1,58 +1,52 @@
-from playwright.sync_api import sync_playwright
-import time
+import asyncio
+from playwright.async_api import async_playwright
+from gemini import summerise_text
 
-def browse_web(query):
-    with sync_playwright() as p:
-        # Use Chromium with stealth options
-        browser = p.chromium.launch(
+async def view_websites(website_links):
+    extracted_content = {}
+
+    async with async_playwright() as p:
+        browser = await p.chromium.launch(
             headless=False,
             args=[
-                "--disable-blink-features=AutomationControlled",
+                "--disable-blink-features=AutomationControlled",  
+                "--disable-extensions",  
+                "--disable-popup-blocking",  
                 "--start-maximized"
             ]
         )
-        
-        # Create a new context with realistic user agent and viewport
-        context = browser.new_context(
-            user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/90.0.4430.212 Safari/537.36",
-            viewport={"width": 1366, "height": 768}
+
+        context = await browser.new_context(
+            user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36",
+            viewport={"width": 1366, "height": 768},
+            bypass_csp=True
         )
-        
-        page = context.new_page()
 
-        # Navigate to DuckDuckGo search
-        page.goto(f"https://duckduckgo.com/?q={query}&ia=web")
-        time.sleep(2)  # Simulate human delay
+        for website_link in website_links:
+            try:
+                # First, visit the original website
+                page = await context.new_page()
+                await page.goto(website_link, timeout=60000)
+                await asyncio.sleep(2)  # Simulate human delay
 
-        # Extract search result links
-        links = []
-        results = page.query_selector_all('a.result__a')  # DuckDuckGo's result link selector
-        for result in results[:3]:  # Get top 3 results
-            href = result.get_attribute('href')
-            if href and href.startswith('http'):
-                links.append(href)
+                # Visit the transformed link (Jina AI)
+                new_page_link = f"https://r.jina.ai/{website_link}"
+                page2 = await context.new_page()
+                await page2.goto(new_page_link, timeout=60000)
+                await asyncio.sleep(2)
 
-        print(f"Found {len(links)} results:")
-        print(page.content())
-        # for link in links:
-        #     print(link)
-        
-        # # Visit each link
-        # for i, link in enumerate(links, 1):
-        #     print(f"\nVisiting result {i}: {link}")
-        #     try:
-        #         page.goto(link, timeout=60000)
-        #         page.wait_for_load_state("networkidle", timeout=60000)
+                # Extract <body> text
+                body_content = await page2.evaluate("document.body.innerText")
+                extracted_content[website_link] = summerise_text(body_content)
+
+                await page.close()
+                await page2.close()
                 
-        #         # Get content with more specific selector
-        #         content = page.query_selector('body').inner_text()[:1000]
-        #         print(f"\nContent preview:\n{content}\n{'-'*50}")
-                
-        #     except Exception as e:
-        #         print(f"Error loading {link}: {str(e)}")
-            
-        #     time.sleep(2)  # Add delay between requests
+            except Exception as e:
+                extracted_content[website_link] = f"Error fetching content: {e}"
 
-        browser.close()
+        await browser.close()
 
-browse_web("latest trends in renewable energy")
+    return extracted_content
+
+print(asyncio.run(view_websites(["https://abc.com/" , "https://www.ibm.com/think/topics/artificial-intelligence"])))
