@@ -6,7 +6,7 @@ import asyncio
 def GetTranscripts(youtube_link):
   if youtube_link:
     youtube_code = youtube_link.split("v=")[1]
-    open_youtube(youtube_link)
+    asyncio.run(open_youtube(youtube_link))
     try :
         out = YouTubeTranscriptApi.get_transcript(youtube_code)
     except NoTranscriptFound:
@@ -26,7 +26,6 @@ def GetTranscripts(youtube_link):
     return main_text
 
 async def open_youtube(youtube_link):
-    extracted_content = {}
 
     async with async_playwright() as p:
         browser = await p.chromium.launch(
@@ -44,8 +43,12 @@ async def open_youtube(youtube_link):
             viewport={"width": 1366, "height": 768},
             bypass_csp=True
         )
-        page = context.new_page()
+        page = await context.new_page()
 
-        page.goto(youtube_link)
-        time.sleep(2)
-        browser.close
+        await page.goto(youtube_link)
+        await asyncio.sleep(2)  # Simulate human delay
+        await browser.close()
+
+
+# print(GetTranscripts("https://www.youtube.com/watch?v=RuwFDrljlmY"))
+# print(asyncio.run(view_websites("what is artificial intelligence" , ["https://abc.com/" , "https://www.ibm.com/think/topics/artificial-intelligence"])))
