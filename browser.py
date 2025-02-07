@@ -1,9 +1,10 @@
-from playwright.sync_api import sync_playwright
+from playwright.async_api import async_playwright
+import asyncio
 import time
 from urllib.parse import unquote
 
 def browse_web(query):
-    with sync_playwright() as p:
+    with async_playwright() as p:
         # Use Chromium with stealth options
         browser = p.chromium.launch(
             headless=False,
@@ -61,4 +62,64 @@ def browse_web(query):
 
         browser.close()
 
-browse_web("latest trends in renewable energy")
+import asyncio
+from playwright.async_api import async_playwright
+
+async def view_websites(website_link):
+    async with async_playwright() as p:
+        browser = await p.chromium.launch(
+            headless=False,
+            args=[
+                "--disable-blink-features=AutomationControlled",
+                "--start-maximized"
+            ]
+        )
+
+        context = await browser.new_context(
+            user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/90.0.4430.212 Safari/537.36",
+            viewport={"width": 1366, "height": 768}
+        )
+
+        # Open first page
+        page = await context.new_page()
+        await page.goto(website_link, timeout=60000)
+        await asyncio.sleep(2)  # Simulate human delay
+        
+        # Open new page with modified link
+        new_page_link = f"https://r.jina.ai/{website_link}"
+        page2 = await context.new_page()
+        await page2.goto(new_page_link, timeout=60000)
+        await asyncio.sleep(2)
+
+        # Extract all content from <body>
+        body_content = await page2.evaluate("document.body.innerText")
+
+        await browser.close()
+        return body_content  # Return extracted text
+
+async def scarpe_content(website_link):
+    # make the link jina ai link
+    website_link = "https://r.jina.ai/" + website_link
+    async with async_playwright() as p:
+        browser = await p.chromium.launch(
+            headless=True,
+            args=[
+                "--disable-blink-features=AutomationControlled",
+                "--start-maximized"
+            ]
+        )
+        
+        context = await browser.new_context(
+            user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/90.0.4430.212 Safari/537.36",
+            viewport={"width": 1366, "height": 768}
+        )
+        
+        page = await context.new_page()
+        await page.goto(website_link, timeout=60000)
+        await asyncio.sleep(2)  # Simulate human delay
+        await browser.close()
+          
+# browse_web("latest trends in renewable energy")
+# view_websites()
+# asyncio.run(view_websites("https://abc.com/"))
+
