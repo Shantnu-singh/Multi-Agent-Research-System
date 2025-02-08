@@ -1,8 +1,37 @@
 from playwright.async_api import async_playwright
 import asyncio
 import time
+import os
 from urllib.parse import unquote
 from gemini import summerise_text
+
+# Serp API intergation 
+from serpapi import GoogleSearch
+
+def get_organic_results(query):
+    params = {
+        "engine": "google",
+        "q": query,
+        "api_key": os.getenv("SERP_API_KEY")
+    }
+    
+    search = GoogleSearch(params)
+    results = search.get_dict()
+    organic_results = results.get("organic_results", [])
+    video_results = results.get("video_results", [])
+    
+    webpages = [result["link"] for result in organic_results[:3]]  # Get top 3 webpage links
+    
+    youtube_link = ""
+    for video in video_results:
+        if "youtube.com" in video["link"]:
+            youtube_link = video["link"]
+            break  # Take the first YouTube link available
+    
+    return {
+        "webpages": webpages,
+        "youtube": youtube_link
+    }
 
 def browse_web(query):
     with async_playwright() as p:

@@ -4,9 +4,15 @@ from playwright.async_api import async_playwright
 import asyncio
 
 def GetTranscripts(youtube_link):
+  if not youtube_link:
+      return "Can't return anything as the video might not exist"
   if youtube_link:
-    youtube_code = youtube_link.split("v=")[1]
-    asyncio.run(open_youtube(youtube_link))
+    try:
+        youtube_code = youtube_link.split("v=")[1]
+        asyncio.run(open_youtube(youtube_link))
+    except:
+        youtube_code = "234h4ng"
+
     try :
         out = YouTubeTranscriptApi.get_transcript(youtube_code)
     except NoTranscriptFound:
@@ -50,5 +56,5 @@ async def open_youtube(youtube_link):
         await browser.close()
 
 
-# print(GetTranscripts("https://www.youtube.com/watch?v=RuwFDrljlmY"))
+# print(GetTranscripts(""))
 # print(asyncio.run(view_websites("what is artificial intelligence" , ["https://abc.com/" , "https://www.ibm.com/think/topics/artificial-intelligence"])))

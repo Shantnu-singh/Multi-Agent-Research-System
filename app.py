@@ -4,26 +4,36 @@ import streamlit as st
 from gemini import give_relevant_link , summerise_text , generate_final_report
 from browser import view_websites
 from youtube import GetTranscripts
+from a import returntest
 
 
 def main():
     st.title("Web Agent for Research")
     
     query = st.text_input("Enter your topic:")
+    search_option = st.radio("Select Search Method:", ("Google Organic Results", "LLM-generated Results"))
+
     if st.button("Search"):
         
         if query.strip():
-            links = give_relevant_link(query)
-            links = links.replace("python" , '')
-            links = links.replace("json" , '')
-            links = links.replace("```" , '')
-            links = ast.literal_eval(links.strip())
-            
             final_content = " "
+            links = {"webpages": [], "youtube": ""}
             
+            if search_option == "LLM-generated Results":
+                links = give_relevant_link(query)
+                links = links.replace("python" , '')
+                links = links.replace("json" , '')
+                links = links.replace("```" , '')
+                links = ast.literal_eval(links.strip())
+            
+            else:
+                links = returntest(query)
+            
+            st.write(links)
             st.subheader("Top Webpages:")
             website_links = links["webpages"]
-
+            
+            st.write(links["webpages"])
             asyncio.set_event_loop_policy(asyncio.WindowsProactorEventLoopPolicy())
             content_dict = asyncio.run(view_websites(query , website_links))
 

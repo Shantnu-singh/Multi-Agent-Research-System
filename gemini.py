@@ -68,7 +68,7 @@ def generate_final_report(text):
         8) Ensure that the output follows strict markdown syntax for readability, using:
             - # for headings,
             - ## for subheadings,
-            - for bullet points,
+            - - for bullet points,
             - **bold** for emphasis,
             - > blockquotes for expert statements,
             - `code` for inline important details.
