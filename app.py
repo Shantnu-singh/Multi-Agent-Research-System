@@ -2,9 +2,9 @@ import ast
 import asyncio
 import streamlit as st
 from gemini import give_relevant_link , summerise_text , generate_final_report
-from browser import view_websites
+from browser import view_websites, get_organic_results
 from youtube import GetTranscripts
-from a import returntest
+
 
 
 def main():
@@ -27,7 +27,7 @@ def main():
                 links = ast.literal_eval(links.strip())
             
             else:
-                links = returntest(query)
+                links = get_organic_results(query)
             
             st.write(links)
             st.subheader("Top Webpages:")
