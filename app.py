@@ -29,11 +29,9 @@ def main():
             else:
                 links = get_organic_results(query)
             
-            st.write(links)
             st.subheader("Top Webpages:")
             website_links = links["webpages"]
             
-            st.write(links["webpages"])
             asyncio.set_event_loop_policy(asyncio.WindowsProactorEventLoopPolicy())
             content_dict = asyncio.run(view_websites(query , website_links))
 
