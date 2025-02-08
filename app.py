@@ -1,13 +1,13 @@
 import ast
 import asyncio
 import streamlit as st
-from gemini import give_relevant_link , summerise_text
+from gemini import give_relevant_link , summerise_text , generate_final_report
 from browser import view_websites
 from youtube import GetTranscripts
 
 
 def main():
-    st.title("Web Agent for Relevant Links")
+    st.title("Web Agent for Research")
     
     query = st.text_input("Enter your topic:")
     if st.button("Search"):
@@ -37,7 +37,7 @@ def main():
             content += GetTranscripts("https://www.youtube.com/watch?v=RuwFDrljlmY")
             final_content += summerise_text(content)
             st.markdown(f"[Watch here]({links['youtube']})")
-            st.markdown(final_content)
+            st.markdown(generate_final_report(final_content))
 
         else:
             st.warning("Please enter a topic to search.")

@@ -8,7 +8,7 @@ load_dotenv()
 
 genai.configure(api_key=os.getenv("GOOGLE_API_KEY"))
 model = genai.GenerativeModel("gemini-1.5-flash")
-# model = genai.GenerativeModel("gemini-pro")
+model2 = genai.GenerativeModel("gemini-pro")
 
 
 def give_relevant_link(text):
@@ -44,44 +44,33 @@ def summerise_text(text):
     """
     return model.generate_content([prompt , text] ).text
 
-# text = """
-# Your liver is all that and more, says Saleh Alqahtani , director of clinical liver research for Johns Hopkins Medicine. The second-largest organ in your body, your liver has some 500 critical jobs. “Your liver removes all toxins, clears medication from your body and metabolizes [breaks down] all your food,” says Dr. Alqahtani.
-
-# It also adjust cholesterol levels, builds proteins and makes bile, which helps you absorb fats, stores sugar for when you really need it and regulates hormone levels. For your liver, that’s all in a day’s work.
-
-# Couple prepares produce on the kitchen counter
-# What could possibly go wrong?
-# Your liver health may not be top of mind, but the minute it malfunctioned there wouldn’t be much else on your mind. Cirrhosis , in which liver cells are replaced with scar tissue, can prevent your liver from doing its critical jobs. So can nonalcoholic fatty liver disease , a fast-growing epidemic among the obese, which can lead to cirrhosis. “If your liver stopped working,” says Dr. Alqahtani, “toxins would accumulate, you couldn’t digest your food and medications would never leave your body.”
-
-# In fact — you can’t live a week without your liver.
-
-# So here’s a list of ways to avoid liver disease. Some of them are healthy behaviors you might do anyway. Others may never have occurred to you. Heed these tips to stay right with your liver.
-
-# Be careful about alcohol consumption
-# If you think only lifelong, falling-down drunks get cirrhosis of the liver — you’re mistaken. Just four ounces a day of hard liquor for men (two for women) can begin to scar your liver.
-
-# Wash produce and steer clear of toxins
-# Pesticides and other toxins can damage your liver. Read warning labels on the chemicals you use.
-
-# Prevent hepatitis A, B and C
-# Get vaccinated: Hepatitis A and B are viral diseases of the liver. While many children have now been immunized, many adults have not. Ask your doctor if you are at risk.
-# Practice safe sex: Hepatitis B and C can develop into chronic conditions that may eventually destroy your liver. They are transmitted by blood and other bodily fluids.
-# Wash your hands: Hepatitis A is spread through contact with contaminated food or water.
-# Watch out for medications and herbs
-# “The number one reason clinical [medicine] trials are stopped or drugs removed from the market is the liver,” warns Dr. Alqahtani, who adds, “20 percent of liver injury in the U.S. is caused by supplements.” The National Institutes of Health has a database of substances known to be toxic to your liver.
-
-# Exercise and eat right
-# Avoid fatty liver disease by avoiding obesity.
-
-
-# Find a Doctor
-
-# Find a Treatment Center
-# Related
-# Hepatitis in Children
-# Endoscopic Retrograde Cholangiopancreatography (ERCP)
-# Primary Sclerosing Cholangitis Treatment
-# Pancreatic Neuroendocrine Tumor
-
-# """
-# print(summerise_text(text))
+def generate_final_report(text):
+    prompt = """
+        1) Title: A clear, concise, and professional title summarizing the topic.
+        2) Introduction: A brief overview of the topic, why it matters, and its relevance in the current landscape.
+            Recent Developments:
+            - Summarize the latest advancements, breakthroughs, or trends related to the topic.
+            - Include references to key sources and expert statements.
+        3) Key Statistics:
+            - present relevant numerical data, percentages, charts, or trends in a well-organized manner.
+            - Provide comparisons, growth rates, and patterns observed.
+        4) Expert Opinions & Analysis:
+            - Curate insights from subject matter experts, researchers, or industry leaders.
+            - Highlight different viewpoints and provide a critical analysis.
+        5) Challenges & Future Outlook:
+            - Discuss any barriers, controversies, or limitations associated with the topic.
+            - Predict potential future developments based on current trends.
+        6) Conclusion:
+            - Provide a summary of the findings, emphasizing key takeaways.
+            - Include a personal perspective or recommendations based on the analyzed data.
+        7) References:
+            - List all sources in markdown format with proper links.
+        8) Ensure that the output follows strict markdown syntax for readability, using:
+            - # for headings,
+            - ## for subheadings,
+            - for bullet points,
+            - **bold** for emphasis,
+            - > blockquotes for expert statements,
+            - `code` for inline important details.
+    """
+    return model2.generate_content([prompt , text] ).text
