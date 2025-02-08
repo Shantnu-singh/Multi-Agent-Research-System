@@ -24,7 +24,7 @@
 
 For a demonstration of how the Web Agent works, check out the video:
 
-![How Web Agent Works](asset\How agent works.mp4)
+[![Watch the video](https://github.com/Shantnu-singh/Browser-agent---Task-1/blob/main/asset/logo.jpg)](https://github.com/Shantnu-singh/Browser-agent---Task-1/blob/main/asset/How%20agent%20works.mp4)
 
 ## Prerequisites
 
