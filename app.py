@@ -34,7 +34,7 @@ def main():
             st.subheader("YouTube Video:")
             st.markdown(links['youtube'])
             content = f"Youtube video on the topic {query}"
-            content += GetTranscripts("https://www.youtube.com/watch?v=RuwFDrljlmY")
+            content += GetTranscripts(links['youtube'])
             final_content += summerise_text(content)
             st.markdown(f"[Watch here]({links['youtube']})")
             st.markdown(generate_final_report(final_content))
